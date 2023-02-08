@@ -31,30 +31,31 @@ class _LoginScreenState extends State<LoginScreen> {
               height: 48.0,
             ),
             RoundedTF(
-              hintText: 'Enter your email address',
-              onChanged: (value) {
-                //Do something with the user input.
-              },
-            ),
+                hintText: 'Enter your email address',
+                onChanged: (value) {
+                  //Do something with the user input.
+                },
+                isObscureText: false,
+                keyboardType: TextInputType.emailAddress),
             SizedBox(
               height: 8.0,
             ),
             RoundedTF(
-              hintText: 'Enter your password',
-              onChanged: (value) {
-                //Do something with the user input.
-              },
-            ),
+                hintText: 'Enter your password',
+                onChanged: (value) {
+                  //Do something with the user input.
+                },
+                isObscureText: true,
+                keyboardType: TextInputType.text),
             SizedBox(
               height: 24.0,
             ),
             RoundedButton(
-              buttonColor: Colors.lightBlueAccent,
-              buttonText: 'Log In',
+                buttonColor: Colors.lightBlueAccent,
+                buttonText: 'Log In',
                 onPressed: () {
                   //Implement login functionality.
-                }
-            )
+                })
           ],
         ),
       ),
