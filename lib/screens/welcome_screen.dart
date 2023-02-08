@@ -22,7 +22,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> with SingleTickerProvider
     super.initState();
 
     animationController = AnimationController(
-      duration: Duration(seconds: 1),
+      duration: const Duration(seconds: 1),
       vsync: this
     );
 
@@ -62,8 +62,8 @@ class _WelcomeScreenState extends State<WelcomeScreen> with SingleTickerProvider
                         'Flash Chat',
                         textStyle: const TextStyle(
                           fontSize: 45.0,
-                          fontWeight: FontWeight.w900
-                    ))
+                          fontWeight: FontWeight.w900),
+                        speed: const Duration(milliseconds: 200))
                   ]),
               ]),
             const SizedBox(height: 48.0),
