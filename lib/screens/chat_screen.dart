@@ -1,7 +1,12 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flash_chat/constants.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flash_chat/components/message_bubble.dart';
+
+final firestore = FirebaseFirestore.instance;
+late User loggedInUser;
 
 class ChatScreen extends StatefulWidget {
   static const String id = 'chatScreen';
@@ -12,10 +17,8 @@ class ChatScreen extends StatefulWidget {
 
 class _ChatScreenState extends State<ChatScreen> {
   final auth = FirebaseAuth.instance;
-  final firestore = FirebaseFirestore.instance;
-
-  late User loggedInUser;
   late String messageText;
+  final messageTextController = TextEditingController();
 
   void getCurrentUser() async {
     try {
@@ -64,33 +67,7 @@ class _ChatScreenState extends State<ChatScreen> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
-            StreamBuilder<QuerySnapshot>(
-              stream: firestore.collection('messages').snapshots(),
-              builder: (context, snapshot) {
-                if (!snapshot.hasData) {
-                  return const Center(
-                    child: CircularProgressIndicator(
-                      backgroundColor: Colors.lightBlueAccent,
-                    ),
-                  );
-                } else {
-                  final messages = snapshot.data?.docs;
-                  List<Text> messageWidgets = [];
-                  for (var message in messages!) {
-                    final messageText = message['text'];
-                    final messageSender = message['sender'];
-
-                    final messageWidget =
-                        Text('$messageText from $messageSender');
-                    messageWidgets.add(messageWidget);
-                  }
-
-                  return Column(
-                    children: messageWidgets,
-                  );
-                }
-              },
-            ),
+            MessagesStream(),
             Container(
               decoration: kMessageContainerDecoration,
               child: Row(
@@ -98,6 +75,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 children: <Widget>[
                   Expanded(
                     child: TextField(
+                      controller: messageTextController,
                       onChanged: (value) {
                         messageText = value;
                       },
@@ -110,6 +88,7 @@ class _ChatScreenState extends State<ChatScreen> {
                         'text': messageText,
                         'sender': loggedInUser.email,
                       });
+                      messageTextController.clear();
                     },
                     child: const Text(
                       'Send',
@@ -123,5 +102,46 @@ class _ChatScreenState extends State<ChatScreen> {
         ),
       ),
     );
+  }
+}
+
+class MessagesStream extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<QuerySnapshot>(
+        stream: firestore.collection('messages').snapshots(),
+        builder: (context, snapshot) {
+          if (!snapshot.hasData) {
+            return const Center(
+              child: CircularProgressIndicator(
+                backgroundColor: Colors.lightBlueAccent,
+              ),
+            );
+          } else {
+            final messages = snapshot.data?.docs.reversed;
+            List<MessageBubble> messageBubbles = [];
+            for (var message in messages!) {
+              final messageText = message['text'];
+              final messageSender = message['sender'];
+
+              final currentUser = loggedInUser.email;
+
+              final messageBubble = MessageBubble(
+                messageSender: messageSender,
+                messageText: messageText,
+                isCurrentUser: currentUser == messageSender,
+              );
+              messageBubbles.add(messageBubble);
+            }
+
+            return Expanded(
+              child: ListView(
+                reverse: true,
+                padding: const EdgeInsets.all(10),
+                children: messageBubbles,
+              ),
+            );
+          }
+        });
   }
 }
