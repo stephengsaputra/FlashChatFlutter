@@ -6,10 +6,11 @@ class MessageBubble extends StatelessWidget {
   String messageSender;
   bool isCurrentUser;
 
-  MessageBubble(
-      {required this.messageSender,
-      required this.messageText,
-      required this.isCurrentUser});
+  MessageBubble({
+    required this.messageSender,
+    required this.messageText,
+    required this.isCurrentUser,
+  });
 
   @override
   Widget build(BuildContext context) {
